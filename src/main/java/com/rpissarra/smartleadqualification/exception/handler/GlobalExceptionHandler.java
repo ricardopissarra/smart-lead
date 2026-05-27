@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(AppException.class)
-    public ResponseEntity<ProblemDetail> handleAppException(AppException ex, HttpServletRequest request) {
+    public ResponseEntity<ProblemDetail> handle(AppException ex, HttpServletRequest request) {
         log.error("Application error [{}] at {}: {}", ex.getClass(), request.getRequestURI(), ex.getMessage());
 
         ProblemDetail problem = buildProblemDetail(ex.getStatus(), ex.getMessage(), request);
@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ProblemDetail> handleException(MethodArgumentNotValidException ex, HttpServletRequest request) {
+    public ResponseEntity<ProblemDetail> handle(MethodArgumentNotValidException ex, HttpServletRequest request) {
         log.error("Validation error at {}", request.getRequestURI());
 
         ProblemDetail problem = buildProblemDetail(HttpStatus.BAD_REQUEST, "One or more validation errors.", request);
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ProblemDetail> handleException(Exception ex, HttpServletRequest request) {
+    public ResponseEntity<ProblemDetail> handle(Exception ex, HttpServletRequest request) {
         log.error("Unhandled exception at {}", request.getRequestURI(), ex);
 
         ProblemDetail problem = buildProblemDetail(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred. Please try again later.", request);
@@ -59,7 +59,6 @@ public class GlobalExceptionHandler {
 
     private ProblemDetail buildProblemDetail(
             HttpStatus status, String detail, HttpServletRequest request) {
-
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(status, detail);
         problem.setTitle(status.getReasonPhrase());
         problem.setInstance(URI.create(request.getRequestURI()));

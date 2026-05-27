@@ -58,7 +58,7 @@ public class HuggingFaceLeadAnalyzerService {
             );
 
             ChatCompletionResponse response = huggingFaceService.completion(request);
-            LeadAnalysisResult result = objectMapper.readValue(response.choices().getFirst().message().content(), LeadAnalysisResult.class);
+            LeadAnalysisResult result = objectMapper.readValue(response.content(), LeadAnalysisResult.class);
 
             if (result.shouldCreateLead()) {
                 NewLeadRequest leadRequest = new NewLeadRequest(
@@ -74,7 +74,7 @@ public class HuggingFaceLeadAnalyzerService {
             return CompletableFuture.completedFuture(null);
         } catch (Exception e) {
             log.error("Unexpected error while analyzing message with AI: {}", e.getMessage(), e);
-            throw new AiResponseException("Error analyzing message with id %d using AI".formatted(1), HttpStatus.BAD_GATEWAY);
+            throw new AiResponseException("Error analyzing message with id %d using AI".formatted(message.getId()), HttpStatus.BAD_GATEWAY);
         }
     }
 }
