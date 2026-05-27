@@ -1,6 +1,7 @@
 package com.rpissarra.smartleadqualification.lead;
 
 import com.rpissarra.smartleadqualification.exception.ResourceNotFoundException;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +16,8 @@ public class LeadService {
         this.leadRepository = leadRepository;
     }
 
-    public List<LeadResponse> getAllLeads() {
-        return leadRepository.findAll().stream()
+    public List<LeadResponse> getAllLeads(Pageable pageable) {
+        return leadRepository.findAll(pageable).stream()
                 .map(LeadResponse::toLeadResponse)
                 .toList();
     }

@@ -1,6 +1,7 @@
 package com.rpissarra.smartleadqualification.message;
 
 import com.rpissarra.smartleadqualification.huggingface.HuggingFaceLeadAnalyzerService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,8 +17,8 @@ public class MessageService {
         this.leadAnalyzerService = leadAnalyzerService;
     }
 
-    public List<MessageResponse> getAllMessages() {
-        return messageRepository.findAll().stream()
+    public List<MessageResponse> getAllMessages(Pageable pageable) {
+        return messageRepository.findAll(pageable).stream()
                 .map(MessageResponse::toMessageResponse)
                 .toList();
     }
@@ -28,7 +29,6 @@ public class MessageService {
                 .build();
         Message message = messageRepository.save(newMessage);
 
-        leadAnalyzerService.analyzeMessage(message);
-        return MessageResponse.toMessageResponse(message);
+        return leadAnalyzerService.analyzeMessage(message).join();
     }
 }

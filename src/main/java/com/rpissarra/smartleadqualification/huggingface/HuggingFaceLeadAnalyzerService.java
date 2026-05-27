@@ -7,6 +7,7 @@ import com.rpissarra.smartleadqualification.lead.LeadResponse;
 import com.rpissarra.smartleadqualification.lead.LeadService;
 import com.rpissarra.smartleadqualification.lead.NewLeadRequest;
 import com.rpissarra.smartleadqualification.message.Message;
+import com.rpissarra.smartleadqualification.message.MessageResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -44,7 +45,7 @@ public class HuggingFaceLeadAnalyzerService {
 
 
     @Async
-    public CompletableFuture<LeadResponse> analyzeMessage(Message message) {
+    public CompletableFuture<MessageResponse> analyzeMessage(Message message) {
         try {
             String prompt = leadPrompt.getContentAsString(StandardCharsets.UTF_8);
 
@@ -67,8 +68,8 @@ public class HuggingFaceLeadAnalyzerService {
                         result.urgencyLevel(),
                         result.description()
                 );
-                Lead newLead = leadService.createNewLead(leadRequest);
-                return CompletableFuture.completedFuture(LeadResponse.toLeadResponse(newLead));
+                leadService.createNewLead(leadRequest);
+                return CompletableFuture.completedFuture(MessageResponse.toMessageResponse(message));
             }
 
             return CompletableFuture.completedFuture(null);
