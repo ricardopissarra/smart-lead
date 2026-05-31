@@ -28,6 +28,8 @@
     </scm>
     <properties>
         <java.version>25</java.version>
+        <aws.cloud.sqs.version>4.0.0</aws.cloud.sqs.version>
+        <sqs.version>2.33.9</sqs.version>
     </properties>
     <dependencies>
         <dependency>
@@ -49,6 +51,21 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-flyway</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.awspring.cloud</groupId>
+            <artifactId>spring-cloud-aws-starter-sqs</artifactId>
+            <version>${aws.cloud.sqs.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.awspring.cloud</groupId>
+            <artifactId>spring-cloud-aws-sqs</artifactId>
+            <version>${aws.cloud.sqs.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>sqs</artifactId>
+            <version>${sqs.version}</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>

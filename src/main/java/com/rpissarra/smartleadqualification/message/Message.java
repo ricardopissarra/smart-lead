@@ -24,6 +24,9 @@ public class Message {
     @Lob
     private String content;
 
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
     @JsonIgnore
     private LocalDateTime createdAt;
 
