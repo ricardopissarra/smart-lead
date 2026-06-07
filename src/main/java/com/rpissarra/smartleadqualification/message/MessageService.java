@@ -1,6 +1,5 @@
 package com.rpissarra.smartleadqualification.message;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -11,7 +10,6 @@ import tools.jackson.databind.ObjectMapper;
 import java.util.List;
 
 @Service
-@Slf4j
 public class MessageService {
 
     @Value("${aws.queque-url}")

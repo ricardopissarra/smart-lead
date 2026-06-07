@@ -13,8 +13,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tools.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
-
 import static org.mockito.BDDMockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,7 +35,7 @@ class SqsMessageListenerTest {
     @Test
     void receiveMessageCreatesNewLead() {
         // given
-        Message message = Message.builder().id(1L).content("random text").status(Status.PROCESSED).build();
+        Message message = Message.builder().id(1L).content("random text").build();
         String content = objectMapper.writeValueAsString(message);
         given(objectMapper.readValue(content, Message.class)).willReturn(message);
         // when
@@ -46,14 +44,14 @@ class SqsMessageListenerTest {
         ArgumentCaptor<Message> messageCaptor = ArgumentCaptor.forClass(Message.class);
         verify(messageService, times(1)).updateMessage(messageCaptor.capture());
         Message updated = messageCaptor.getValue();
-        assertEquals(message.getStatus(), updated.getStatus());
+        assertEquals(Status.PROCESSED, updated.getStatus());
     }
 
     @DisplayName("Message listener throws exception and updates message as failed")
     @Test
-    void receiveMessageCreatesUpdateAsFailed() throws IOException {
+    void receiveMessageCreatesUpdateAsFailed() {
         // given
-        Message message = Message.builder().id(1L).content("random text").status(Status.FAILED).build();
+        Message message = Message.builder().id(1L).content("random text").build();
         String content = objectMapper.writeValueAsString(message);
         given(objectMapper.readValue(content, Message.class)).willReturn(message);
         doThrow(new RuntimeException("Random Error")).when(analyzerService).analyzeMessage(message);
@@ -63,6 +61,6 @@ class SqsMessageListenerTest {
         ArgumentCaptor<Message> messageCaptor = ArgumentCaptor.forClass(Message.class);
         verify(messageService, times(1)).updateMessage(messageCaptor.capture());
         Message updated = messageCaptor.getValue();
-        assertEquals(message.getStatus(), updated.getStatus());
+        assertEquals(Status.FAILED, updated.getStatus());
     }
 }

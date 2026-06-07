@@ -67,17 +67,15 @@ class LeadServiceTest {
     @Test
     void createNewLead() {
             // given
-            NewLeadRequest leadRequest = new NewLeadRequest("other", Type.OTHER, UrgencyLevel.LOW, "other type of lead");
+            NewLeadRequest leadRequest = new NewLeadRequest("other", Type.OTHER, UrgencyLevel.LOW, "other type of lead", null);
             Lead lead = NewLeadRequest.toLead(leadRequest);
             given(leadRepository.save(lead)).willReturn(lead);
 
             // when
-            underTest.createNewLead(leadRequest);
+            Lead actual = underTest.createNewLead(leadRequest);
 
             // then
-            ArgumentCaptor<Lead> leadCaptor = ArgumentCaptor.forClass(Lead.class);
-            verify(leadRepository, times(1)).save(leadCaptor.capture());
-            Lead actual = leadCaptor.getValue();
+            verify(leadRepository, times(1)).save(lead);
             assertEquals(leadRequest.title(), actual.getTitle());
             assertEquals(leadRequest.type(), actual.getType());
             assertEquals(leadRequest.urgencyLevel(), actual.getUrgencyLevel());

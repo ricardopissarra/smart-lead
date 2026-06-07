@@ -1,13 +1,15 @@
 package com.rpissarra.smartleadqualification.huggingface;
 
 import com.rpissarra.smartleadqualification.configuration.HuggingFacesConfiguration;
+import com.rpissarra.smartleadqualification.lead.Lead;
 import com.rpissarra.smartleadqualification.lead.LeadService;
 import com.rpissarra.smartleadqualification.lead.NewLeadRequest;
 import com.rpissarra.smartleadqualification.message.Message;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
 
@@ -15,9 +17,15 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-@Service
-@Slf4j
-public class HuggingFaceLeadAnalyzerService {
+@Service("huggingFaceLeadAnalyzerService")
+@ConditionalOnProperty(
+        name = "enable.fake.hf",
+        havingValue = "false",
+        matchIfMissing = true
+)
+public class HuggingFaceLeadAnalyzerService implements HuggingFaceLeadAnalyzer {
+
+    private static final Logger log = LoggerFactory.getLogger(HuggingFaceLeadAnalyzerService.class);
 
     private final HuggingFaceService huggingFaceService;
     private final LeadService leadService;
@@ -39,9 +47,16 @@ public class HuggingFaceLeadAnalyzerService {
     }
 
 
-    @Async
-    public void analyzeMessage(Message message) throws IOException {
-        String prompt = leadPrompt.getContentAsString(StandardCharsets.UTF_8);
+    @Override
+    public Lead analyzeMessage(Message message) {
+        log.info("Analyzing message: {}", message.getContent());
+
+        String prompt;
+        try {
+            prompt = leadPrompt.getContentAsString(StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
 
         HuggingFaceRequest request = new HuggingFaceRequest(
                 hfConfig.getModel(),
@@ -60,9 +75,12 @@ public class HuggingFaceLeadAnalyzerService {
                     result.title(),
                     result.type(),
                     result.urgencyLevel(),
-                    result.description()
+                    result.description(),
+                    message
             );
-            leadService.createNewLead(leadRequest);
+            return leadService.createNewLead(leadRequest);
         }
+
+        return null;
     }
 }

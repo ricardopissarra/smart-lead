@@ -33,7 +33,7 @@ public class LeadService {
                 );
     }
 
-    public void createNewLead(NewLeadRequest leadRequest) {
-        leadRepository.save(NewLeadRequest.toLead(leadRequest));
+    public Lead createNewLead(NewLeadRequest leadRequest) {
+        return leadRepository.save(NewLeadRequest.toLead(leadRequest));
     }
 }
