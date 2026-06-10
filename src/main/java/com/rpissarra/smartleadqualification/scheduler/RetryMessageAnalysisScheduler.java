@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class RetryMessageAnalysisScheduler {
 
@@ -23,7 +25,7 @@ public class RetryMessageAnalysisScheduler {
         this.messageService = messageService;
     }
 
-    @Scheduled(cron = "0 0 * * * *")
+    @Scheduled(cron = "0 */15 * * * *")
     public void reprocessFailedMessages() {
         messageService.getAllMessagesByStatus(Status.FAILED)
                 .forEach(message -> {
@@ -32,7 +34,25 @@ public class RetryMessageAnalysisScheduler {
                                 message.setStatus(Status.PROCESSED);
                                 messageService.updateMessage(message);
                             } catch (Exception e) {
-                                log.error("Error [{}] analyzing message with id {}", e.getClass(), message.getId(), e);
+                                log.error("Error [{}] reprocessing message with id {}", e.getClass(), message.getId(), e);
+                            }
+                        }
+                );
+    }
+
+    @Scheduled(cron = "0 */15 * * * *")
+    public void reprocessUnprocessedMessages() {
+        messageService.getAllMessagesByStatusAndCreateDate(
+                        Status.CREATED,
+                        LocalDateTime.now().minusMinutes(15)
+                )
+                .forEach(message -> {
+                            try {
+                                analyzerService.analyzeMessage(message);
+                                message.setStatus(Status.PROCESSED);
+                                messageService.updateMessage(message);
+                            } catch (Exception e) {
+                                log.error("Error [{}] reprocessing message with id {}", e.getClass(), message.getId(), e);
                             }
                         }
                 );

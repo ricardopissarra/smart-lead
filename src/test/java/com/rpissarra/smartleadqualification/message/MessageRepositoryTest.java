@@ -12,6 +12,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -69,5 +70,40 @@ class MessageRepositoryTest {
         // then
         assertEquals(0, actual.size());
         assertEquals(Collections.EMPTY_LIST, actual);
+    }
+
+    @DisplayName("Find message by status and DateTime should return empty list")
+    @Test
+    void findMessagesByStatusAndLocalDateTimeReturnsEmptyList() {
+        // given
+        List<Message> messages = List.of(
+                Message.builder().content("message").status(Status.CREATED).build(),
+                Message.builder().content("create lead").status(Status.PROCESSED).build(),
+                Message.builder().content("failed").status(Status.FAILED).build(),
+                Message.builder().content("failed 2").status(Status.FAILED).build()
+        );
+        underTest.saveAll(messages);
+        // when
+        List<Message> actual = underTest.findMessagesByStatusAndCreatedAt(Status.CREATED, LocalDateTime.now().plusMinutes(1));
+        // then
+        assertEquals(0, actual.size());
+        assertEquals(Collections.EMPTY_LIST, actual);
+    }
+
+    @DisplayName("Find message by status and DateTime should return message list")
+    @Test
+    void findMessagesByStatusAndLocalDateTimeReturnsMessageList() {
+        // given
+        List<Message> messages = List.of(
+                Message.builder().content("message").status(Status.CREATED).build(),
+                Message.builder().content("create lead").status(Status.PROCESSED).build(),
+                Message.builder().content("Created message").status(Status.CREATED).build(),
+                Message.builder().content("failed 2").status(Status.FAILED).build()
+        );
+        underTest.saveAll(messages);
+        // when
+        List<Message> actual = underTest.findMessagesByStatusAndCreatedAt(Status.CREATED, LocalDateTime.now().minusMinutes(15));
+        // then
+        assertEquals(2, actual.size());
     }
 }

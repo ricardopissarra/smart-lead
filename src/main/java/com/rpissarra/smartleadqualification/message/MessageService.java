@@ -7,18 +7,24 @@ import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 import tools.jackson.databind.ObjectMapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class MessageService {
 
-    @Value("${aws.queque-url}")
-    private String queueUrl;
+
+    private final String queueUrl;
     private final MessageRepository messageRepository;
     private final SqsAsyncClient sqsAsyncClient;
     private final ObjectMapper objectMapper;
 
-    public MessageService(MessageRepository messageRepository, SqsAsyncClient sqsAsyncClient, ObjectMapper objectMapper) {
+    public MessageService(
+            @Value("${aws.queque-url}") String queueUrl,
+            MessageRepository messageRepository,
+            SqsAsyncClient sqsAsyncClient,
+            ObjectMapper objectMapper) {
+        this.queueUrl = queueUrl;
         this.messageRepository = messageRepository;
         this.sqsAsyncClient = sqsAsyncClient;
         this.objectMapper = objectMapper;
@@ -46,6 +52,10 @@ public class MessageService {
 
     public List<Message> getAllMessagesByStatus(Status status) {
         return messageRepository.findMessagesByStatus(status);
+    }
+
+    public List<Message> getAllMessagesByStatusAndCreateDate(Status status, LocalDateTime time) {
+        return messageRepository.findMessagesByStatusAndCreatedAt(status, time);
     }
 
     private void sendSqsMessage(String content) {
