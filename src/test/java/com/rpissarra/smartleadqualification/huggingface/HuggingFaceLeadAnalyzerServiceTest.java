@@ -2,7 +2,6 @@ package com.rpissarra.smartleadqualification.huggingface;
 
 import com.rpissarra.smartleadqualification.lead.*;
 import com.rpissarra.smartleadqualification.message.Message;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -125,9 +124,8 @@ class HuggingFaceLeadAnalyzerServiceTest {
     }
 
     @DisplayName("Analyze message should throw exception")
-    @SneakyThrows(IOException.class)
     @Test
-    void analyzeMessageShouldThrowException() {
+    void analyzeMessageShouldThrowException() throws IOException {
         // given
         when(leadPrompt.getContentAsString(StandardCharsets.UTF_8)).thenThrow(
                 new IllegalStateException("Error reading prompt file")
