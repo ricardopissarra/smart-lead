@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 
 @Service("fakeHuggingFaceLeadAnalyzerService")
 @ConditionalOnProperty(
@@ -25,7 +27,7 @@ public class FakeHuggingFaceLeadAnalyzerService implements HuggingFaceLeadAnalyz
 
 
     @Override
-    public Lead analyzeMessage(Message message) {
+    public Optional<Lead> analyzeMessage(Message message) {
         log.info("Fake Analyzing message: {}", message.getContent());
         NewLeadRequest leadRequest = new NewLeadRequest(
                 message.getContent(),
@@ -34,6 +36,6 @@ public class FakeHuggingFaceLeadAnalyzerService implements HuggingFaceLeadAnalyz
                 message.getContent(),
                 message
         );
-        return leadService.createNewLead(leadRequest);
+        return Optional.of(leadService.createNewLead(leadRequest));
     }
 }

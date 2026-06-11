@@ -2,7 +2,7 @@ package com.rpissarra.smartleadqualification.sqs;
 
 import com.rpissarra.smartleadqualification.huggingface.HuggingFaceLeadAnalyzerService;
 import com.rpissarra.smartleadqualification.message.Message;
-import com.rpissarra.smartleadqualification.message.MessageService;
+import com.rpissarra.smartleadqualification.message.MessageRepository;
 import com.rpissarra.smartleadqualification.message.Status;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,7 @@ class SqsMessageListenerTest {
     private ObjectMapper objectMapper;
 
     @Mock
-    private MessageService messageService;
+    private MessageRepository messageRepository;
 
     @InjectMocks
     private SqsMessageListener underTest;
@@ -42,7 +42,7 @@ class SqsMessageListenerTest {
         underTest.receiveMessage(content);
         // then
         ArgumentCaptor<Message> messageCaptor = ArgumentCaptor.forClass(Message.class);
-        verify(messageService, times(1)).updateMessage(messageCaptor.capture());
+        verify(messageRepository, times(2)).save(messageCaptor.capture());
         Message updated = messageCaptor.getValue();
         assertEquals(Status.PROCESSED, updated.getStatus());
     }
@@ -59,7 +59,7 @@ class SqsMessageListenerTest {
         underTest.receiveMessage(content);
         // then
         ArgumentCaptor<Message> messageCaptor = ArgumentCaptor.forClass(Message.class);
-        verify(messageService, times(1)).updateMessage(messageCaptor.capture());
+        verify(messageRepository, times(2)).save(messageCaptor.capture());
         Message updated = messageCaptor.getValue();
         assertEquals(Status.FAILED, updated.getStatus());
     }

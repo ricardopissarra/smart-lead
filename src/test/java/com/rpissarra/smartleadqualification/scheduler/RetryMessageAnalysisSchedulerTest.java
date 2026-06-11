@@ -11,7 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.BDDMockito.*;
@@ -30,7 +30,7 @@ class RetryMessageAnalysisSchedulerTest {
 
     @DisplayName("Scheduler reprocesses failed messages")
     @Test
-    void reprocessFailedMessages() throws IOException {
+    void reprocessFailedMessages() {
         // given
         List<Message> messages = List.of(
                 Message.builder().id(3L).content("failed").status(Status.FAILED).build(),
@@ -41,5 +41,19 @@ class RetryMessageAnalysisSchedulerTest {
         underTest.reprocessFailedMessages();
         // then
         verify(analyzerService, times(2)).analyzeMessage(any(Message.class));
+    }
+
+    @DisplayName("Scheduler reprocesses failed messages")
+    @Test
+    void reprocessCreatedAndNotProcessedInTheLast15MinMessages() {
+        // given
+        List<Message> messages = List.of(
+                Message.builder().id(3L).content("Created").status(Status.CREATED).build()
+        );
+        given(messageService.getAllMessagesByStatusAndCreateDate(eq(Status.CREATED), any(LocalDateTime.class))).willReturn(messages);
+        // when
+        underTest.reprocessUnprocessedMessages();
+        // then
+        verify(analyzerService, times(1)).analyzeMessage(any(Message.class));
     }
 }
