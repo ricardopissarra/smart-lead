@@ -16,12 +16,6 @@ public class AiConfig {
 
     @Bean
     public ChatClient chatClient(ChatClient.Builder builder) {
-        return builder
-                .defaultSystem("""
-                        You are a lead qualification assistant. Analyze the incoming
-                        message and determine if it is a qualified sales lead or just a general
-                        inquiry.
-                        """)
-                .build();
+        return builder.build();
     }
 }

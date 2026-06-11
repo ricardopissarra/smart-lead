@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -29,18 +28,15 @@ public class HuggingFaceLeadAnalyzerService implements HuggingFaceLeadAnalyzer {
 
     private final LeadService leadService;
     private final Resource leadPrompt;
-    private final ObjectMapper objectMapper;
     private final ChatClient chatClient;
 
     public HuggingFaceLeadAnalyzerService(
             LeadService leadService,
             @Value("classpath:/prompt/lead-prompt.txt") Resource leadPrompt,
-            ObjectMapper objectMapper,
             ChatClient chatClient
     ) {
         this.leadService = leadService;
         this.leadPrompt = leadPrompt;
-        this.objectMapper = objectMapper;
         this.chatClient = chatClient;
     }
 
@@ -56,20 +52,18 @@ public class HuggingFaceLeadAnalyzerService implements HuggingFaceLeadAnalyzer {
             throw new IllegalStateException(e.getMessage());
         }
 
-        String rawJson = chatClient.prompt()
+        Optional<LeadAnalysisResult> result = Optional.ofNullable(chatClient.prompt()
                 .system(prompt)
                 .user(message.getContent())
                 .call()
-                .content();
+                .entity(LeadAnalysisResult.class));
 
-        LeadAnalysisResult result = objectMapper.readValue(rawJson, LeadAnalysisResult.class);
-
-        if (result.shouldCreateLead()) {
+        if (result.isPresent() && result.get().shouldCreateLead()) {
             NewLeadRequest leadRequest = new NewLeadRequest(
-                    result.title(),
-                    result.type(),
-                    result.urgencyLevel(),
-                    result.description(),
+                    result.get().title(),
+                    result.get().type(),
+                    result.get().urgencyLevel(),
+                    result.get().description(),
                     message
             );
             return Optional.of(leadService.createNewLead(leadRequest));
