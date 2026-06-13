@@ -128,7 +128,7 @@ class HuggingFaceLeadAnalyzerServiceTest {
     void analyzeMessageShouldThrowException() throws IOException {
         // given
         when(leadPrompt.getContentAsString(StandardCharsets.UTF_8)).thenThrow(
-                new IllegalStateException("Error reading prompt file")
+                new IOException("Error reading prompt file")
         );
        // then
         verify(leadService, never()).createNewLead(any());
