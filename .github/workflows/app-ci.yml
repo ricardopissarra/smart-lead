@@ -15,36 +15,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-#    services:
-#      postgres:
-#        image: postgres:18-alpine
-#        env:
-#          POSTGRES_USER: myuser
-#          POSTGRES_PASSWORD: mysecretpassword
-#          POSTGRES_DB: smartlead
-#        ports:
-#          - 5432:5432
-#        options: >-
-#          --health-cmd pg_isready
-#          --health-interval 10s
-#          --health-timeout 5s
-#          --health-retries 5
-#      localstack:
-#        image: localstack/localstack:latest
-#        ports:
-#          - "4566:4566"
-#        env:
-#          - SERVICES=sqs
-#          - DEBUG=1
-#          - AWS_DEFAULT_REGION=us-east-1
-#          - LOCALSTACK_HOST=localhost
-#          - AWS_ACCESS_KEY_ID=test
-#          - AWS_SECRET_ACCESS_KEY=test
-#        options: >-
-#          --health-cmd="awslocal status services"
-#          --health-interval=10s
-#          --health-timeout=5s
-#          --health-retries=5
 
     defaults:
       run:
