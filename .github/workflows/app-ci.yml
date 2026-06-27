@@ -1,0 +1,72 @@
+name: CI - Build
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - src/**
+  pull_request:
+    branches:
+      - master
+    paths:
+      - src/**
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+#    services:
+#      postgres:
+#        image: postgres:18-alpine
+#        env:
+#          POSTGRES_USER: myuser
+#          POSTGRES_PASSWORD: mysecretpassword
+#          POSTGRES_DB: smartlead
+#        ports:
+#          - 5432:5432
+#        options: >-
+#          --health-cmd pg_isready
+#          --health-interval 10s
+#          --health-timeout 5s
+#          --health-retries 5
+#      localstack:
+#        image: localstack/localstack:latest
+#        ports:
+#          - "4566:4566"
+#        env:
+#          - SERVICES=sqs
+#          - DEBUG=1
+#          - AWS_DEFAULT_REGION=us-east-1
+#          - LOCALSTACK_HOST=localhost
+#          - AWS_ACCESS_KEY_ID=test
+#          - AWS_SECRET_ACCESS_KEY=test
+#        options: >-
+#          --health-cmd="awslocal status services"
+#          --health-interval=10s
+#          --health-timeout=5s
+#          --health-retries=5
+
+    defaults:
+      run:
+        working-directory: ./
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up java
+        uses: actions/setup-java@v5
+        with:
+          distribution: "temurin"
+          java-version: "21"
+          cache: "maven"
+
+      - name: Build and run Unit/Integration Tests with Maven
+        run: mvn -ntp -B verify
+
+      - name: Publish test report
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Maven Tests
+          path: target/surefire-reports/*.xml
+          reporter: java-junit
