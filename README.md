@@ -131,29 +131,49 @@ docker compose up -d
 This starts:
 - **LocalStack** on port `4566` (SQS)
 - **PostgreSQL** on port `5432`
-
+- **Grafana** on port `3000` (for metrics)
+- **OpenTelemetry Collector** on port `4318` (for metrics)
+- 
 ### 2. Configure the application
 
-Set the following properties in `application.yml` (or as environment variables):
+Set the following properties in `application.properties` (or as environment variables):
 
-```yaml
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/smartlead
-    username: myuser
-    password: mysecretpassword
+```properties
+# Database
+spring.datasource.url=jdbc:postgresql://localhost:5432/smartlead
+spring.datasource.username=myuser
+spring.datasource.password=mysecretpassword
 
-aws:
-  queque-url: http://localhost:4566/000000000000/<your-queue-name>
-
-app:
-  queue:
-    name: <your-queue-name>
+# AWS SQS
+spring.cloud.aws.credentials.access-key=test
+spring.cloud.aws.credentials.secret-key=test
+spring.cloud.aws.sqs.endpoint=http://localhost:4566
+aws.queque-url=http://localhost:4566/000000000000/message-analysis-queue
+app.queue.name=message-analysis-queue
 
 # Set to true to skip real HuggingFace calls during development
-enable:
-  fake:
-    hf: false
+enable.fake.hf=false
+
+# Management endpoints
+management.endpoints.web.exposure.include=health,info,prometheus,metrics
+management.endpoint.health.show-details=always
+
+# Enable liveness and readiness probes
+management.endpoint.health.probes.enabled=true
+management.health.mongodb.enabled=false
+
+# Enable liveness & readiness states
+management.health.livenessState.enabled=true
+management.health.readinessState.enabled=true
+
+# Observability
+# For development keep 1.0 for all traces to export, production environment keep 0.1
+management.tracing.sampling.probability=1.0
+management.otlp.metrics.export.enabled=true
+management.otlp.metrics.export.url=http://localhost:4318/v1/metrics
+management.opentelemetry.tracing.export.otlp.endpoint=¢http://localhost:4318/v1/traces
+management.opentelemetry.logging.export.otlp.endpoint=http://localhost:4318/v1/logs
+
 ```
 
 ### 3. Run the application

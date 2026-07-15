@@ -34,6 +34,7 @@
         <sqs.version>2.33.9</sqs.version>
         <spring.doc.version>3.0.2</spring.doc.version>
         <testcontainers.version>2.0.5</testcontainers.version>
+        <otel.logback.appender.version>2.21.0-alpha</otel.logback.appender.version>
     </properties>
 
     <dependencyManagement>
@@ -116,8 +117,32 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Test -->
+        <!-- Actuator -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
 
+        <!-- Observability -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-opentelemetry</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-logback-appender-1.0</artifactId>
+            <version>${otel.logback.appender.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-otlp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-exporter-otlp</artifactId>
+        </dependency>
+
+        <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
