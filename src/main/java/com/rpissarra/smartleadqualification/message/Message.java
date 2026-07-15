@@ -29,6 +29,7 @@ public class Message {
     private Lead lead;
 
     @JsonIgnore
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @JsonIgnore

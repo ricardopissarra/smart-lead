@@ -34,6 +34,7 @@ public class Lead {
     private Message message;
 
     @JsonIgnore
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @JsonIgnore
