@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -24,6 +26,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/messages")
 public class MessageController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageController.class);
 
     private final MessageService messageService;
 
@@ -49,6 +53,7 @@ public class MessageController {
             Pageable pageable
 
     ) {
+        LOGGER.info("Getting all messages");
         return messageService.getAllMessages(pageable);
     }
 
@@ -83,6 +88,7 @@ public class MessageController {
     public ResponseEntity<MessageResponse> createNewMessage(
             @Valid @RequestBody MessageRequest messageRequest
     ) {
+        LOGGER.info("Creating new message: {}", messageRequest.content());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(

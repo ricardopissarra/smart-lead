@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -25,8 +26,10 @@ public class RetryMessageAnalysisScheduler {
         this.messageService = messageService;
     }
 
-    @Scheduled(cron = "0 */15 * * * *")
+    @Scheduled(cron = "0 */2 * * * *")
+    @Transactional
     public void reprocessFailedMessages() {
+        log.info("Reprocessing failed messages");
         messageService.getAllMessagesByStatus(Status.FAILED)
                 .forEach(message -> {
                             try {
@@ -40,8 +43,10 @@ public class RetryMessageAnalysisScheduler {
                 );
     }
 
-    @Scheduled(cron = "0 */15 * * * *")
+    @Scheduled(cron = "0 */1 * * * *")
+    @Transactional
     public void reprocessUnprocessedMessages() {
+        log.info("Reprocessing unprocessed messages");
         messageService.getAllMessagesByStatusAndCreateDate(
                         Status.CREATED,
                         LocalDateTime.now().minusMinutes(15)
