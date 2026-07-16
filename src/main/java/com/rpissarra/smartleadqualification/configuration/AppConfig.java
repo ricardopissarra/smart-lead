@@ -9,6 +9,8 @@ import io.micrometer.core.instrument.binder.jvm.convention.otel.OpenTelemetryJvm
 import io.micrometer.core.instrument.binder.jvm.convention.otel.OpenTelemetryJvmMemoryMeterConventions;
 import io.micrometer.core.instrument.binder.jvm.convention.otel.OpenTelemetryJvmThreadMeterConventions;
 import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
+import io.micrometer.observation.ObservationRegistry;
+import io.micrometer.observation.aop.ObservedAspect;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.support.ContextPropagatingTaskDecorator;
@@ -62,5 +64,10 @@ public class AppConfig {
     @Bean
     ClassLoaderMetrics classLoaderMetrics() {
         return new ClassLoaderMetrics(new OpenTelemetryJvmClassLoadingMeterConventions());
+    }
+
+    @Bean
+    ObservedAspect observedAspect(ObservationRegistry registry) {
+        return new ObservedAspect(registry);
     }
 }

@@ -1,5 +1,8 @@
 package com.rpissarra.smartleadqualification.message;
 
+import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.context.propagation.ContextPropagators;
+import io.opentelemetry.context.propagation.TextMapPropagator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +32,8 @@ class MessageServiceTest {
     private SqsAsyncClient sqsAsyncClient;
     @Mock
     private ObjectMapper objectMapper;
+    @Mock
+    private OpenTelemetry openTelemetry;
 
     @InjectMocks
     private MessageService underTest;
@@ -79,6 +84,12 @@ class MessageServiceTest {
                 .status(Status.CREATED)
                 .build();
         given(messageRepository.save(message)).willReturn(message);
+
+        // Mock the OTel propagation chain so extract() doesn't NPE
+        ContextPropagators contextPropagators = mock(ContextPropagators.class);
+        TextMapPropagator textMapPropagator = mock(TextMapPropagator.class);
+        given(openTelemetry.getPropagators()).willReturn(contextPropagators);
+        given(contextPropagators.getTextMapPropagator()).willReturn(textMapPropagator);
         // when
         MessageResponse actual = underTest.createNewMessage(messageRequest);
         // then
